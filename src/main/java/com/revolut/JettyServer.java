@@ -8,6 +8,7 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.jboss.weld.environment.servlet.Listener;
 
 /**
  * @author teyma
@@ -22,6 +23,7 @@ public class JettyServer {
         Server jettyServer = new Server(8080);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath(CONTEXT_ROOT);
+        context.addEventListener(new Listener());
         jettyServer.setHandler(context);
 
         // Setup API resources
