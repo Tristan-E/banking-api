@@ -1,6 +1,7 @@
-package com.revolut.dao;
+package com.revolut.persistence.repository;
 
 import com.revolut.model.Transaction;
+import com.revolut.persistence.PersistenceUtil;
 
 import java.util.List;
 
