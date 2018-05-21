@@ -3,10 +3,12 @@ package com.revolut;
 import com.revolut.persistence.PersistenceUtil;
 import com.revolut.model.Transaction;
 import io.swagger.jaxrs.config.DefaultJaxrsConfig;
+import org.aeonbits.owner.ConfigFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.glassfish.jersey.server.ServerConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 import javax.persistence.EntityManager;
@@ -22,9 +24,16 @@ public class JettyServer {
     static final String CONTEXT_ROOT = "/";
 
     public static void main(String[] args) throws Exception {
-        org.h2.tools.Server.createWebServer(new String[]{"-web","-webAllowOthers","-webPort","7071"}).start();
 
-        Server jettyServer = new Server(8080);
+        // Loading application properties
+        ApplicationProperties props = ConfigFactory.create(ApplicationProperties.class);
+
+        // Access to the h2 console if enabled
+        if(props.isH2ConsoleEnabled()) {
+            org.h2.tools.Server.createWebServer(new String[]{"-web","-webAllowOthers","-webPort", props.h2ConsolePort()}).start();
+        }
+
+        Server jettyServer = new Server(props.applicationPort());
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath(CONTEXT_ROOT);
         jettyServer.setHandler(context);
