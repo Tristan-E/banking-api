@@ -13,6 +13,9 @@ public interface ApplicationProperties extends Config {
     @DefaultValue("8080")
     int applicationPort();
 
+    @Key("app.api.version")
+    String apiVersion();
+
     @Key("h2.console.enabled")
     @DefaultValue("false")
     boolean isH2ConsoleEnabled();

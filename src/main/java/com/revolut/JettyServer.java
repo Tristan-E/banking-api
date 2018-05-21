@@ -53,7 +53,7 @@ public class JettyServer {
         // Setup Swagger servlet
         ServletHolder swaggerServlet = context.addServlet(DefaultJaxrsConfig.class, "/swagger-core");
         swaggerServlet.setInitOrder(2);
-        swaggerServlet.setInitParameter("api.version", "1.0.0");
+        swaggerServlet.setInitParameter("api.version", props.apiVersion());
         swaggerServlet.setInitParameter("swagger.api.basepath", APPLICATION_PATH);
 
         // Setup Swagger-UI static resources
