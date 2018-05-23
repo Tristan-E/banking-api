@@ -1,7 +1,7 @@
 package com.revolut;
 
 import com.revolut.persistence.PersistenceUtil;
-import com.revolut.model.Transaction;
+import com.revolut.persistence.model.Transaction;
 import io.swagger.jaxrs.config.DefaultJaxrsConfig;
 import org.aeonbits.owner.ConfigFactory;
 import org.eclipse.jetty.server.Server;
@@ -61,8 +61,8 @@ public class JettyServer {
         context.setResourceBase(resourceBasePath);
         context.addServlet(new ServletHolder(new DefaultServlet()), "/*");
 
-        // TODO REMOVE
-        generateInitialContent();
+        // Initializing Persistence
+        PersistenceUtil.initializeEntityManagerFactory();
 
         try {
             jettyServer.start();

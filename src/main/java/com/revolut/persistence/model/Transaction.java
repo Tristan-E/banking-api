@@ -1,15 +1,13 @@
-package com.revolut.model;
+package com.revolut.persistence.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 
 /**
  * @author teyma
@@ -26,4 +24,18 @@ public class Transaction {
     private long id;
 
     private BigDecimal amount;
+
+    @OneToOne
+    private Account sourceAccount;
+
+    @OneToOne
+    private Account destinationAccount;
+
+    private ZonedDateTime date;
+
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus status;
+
+    @Enumerated(EnumType.STRING)
+    private TransactionMethod method;
 }

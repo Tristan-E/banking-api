@@ -5,25 +5,33 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.Collection;
 
 /**
  * @author teyma
- * @since 19/05/2018
+ * @since 21/05/2018
  */
 @Entity
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode
-public class Transaction {
+public class Account {
+
+    public Account() {
+        this.currentBalance = BigDecimal.ZERO;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
 
-    private BigDecimal amount;
+    @NotNull
+    private BigDecimal currentBalance;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private Collection<Transaction> transactions;
 }

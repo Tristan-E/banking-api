@@ -1,7 +1,11 @@
 package com.revolut.persistence.model;
 
 /**
- * Created by pierre on 21/05/18.
+ * @author teyma
+ * @since 21/05/18
  */
-public class TransactionStatus {
+public enum TransactionStatus {
+    COMPLETED,
+    CHALLENGED,
+    DENIED
 }

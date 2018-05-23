@@ -1,6 +1,6 @@
 package com.revolut.persistence.repository;
 
-import com.revolut.model.Transaction;
+import com.revolut.persistence.model.Transaction;
 import com.revolut.persistence.AbstractHibernateRepository;
 
 /**

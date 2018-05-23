@@ -70,7 +70,7 @@ public class TransactionIT {
     }
 
     @Test
-    public void givenUserDoesNotExists_whenUserInfoIsRetrieved_then404IsReceived() throws IOException {
+    public void test() throws IOException {
 
         // Given
         HttpUriRequest request = new HttpGet("http://localhost:8080/api/transactions");

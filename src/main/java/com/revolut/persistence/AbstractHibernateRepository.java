@@ -1,5 +1,6 @@
 package com.revolut.persistence;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ public abstract class AbstractHibernateRepository<T> implements IGenericReposito
     }
 
     public T findOne(long id) {
-        return null;
+        return (T) PersistenceUtil.getEntityManager().createQuery(String.format("from %s where id = %d", clazz.getName(), id)).getSingleResult();
     }
 
     public List<T> findAll() {
@@ -22,18 +23,38 @@ public abstract class AbstractHibernateRepository<T> implements IGenericReposito
     }
 
     public void create(T entity) {
-
+        EntityManager entityManager = PersistenceUtil.getEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(entity);
+        entityManager.getTransaction().commit();
     }
 
     public T update(T entity) {
-        return null;
+        EntityManager entityManager = PersistenceUtil.getEntityManager();
+        entityManager.getTransaction().begin();
+        entity = entityManager.merge(entity);
+        entityManager.getTransaction().commit();
+
+        return entity;
     }
 
     public void delete(T entity) {
-
+        EntityManager entityManager = PersistenceUtil.getEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.remove(entity);
+        entityManager.getTransaction().commit();
     }
 
     public void deleteById(long entityId) {
+        EntityManager entityManager = PersistenceUtil.getEntityManager();
+        entityManager.getTransaction().begin();
 
+        T entity = (T) entityManager.createQuery(String.format("from %s where id = %d", clazz.getName(), entityId)).getSingleResult();
+        if(entity != null) {
+            entityManager.remove(entity);
+            entityManager.getTransaction().commit();
+        } else {
+            entityManager.getTransaction().rollback();
+        }
     }
 }

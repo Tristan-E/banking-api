@@ -10,12 +10,21 @@ import javax.persistence.Persistence;
  */
 public class PersistenceUtil {
 
+    private static EntityManagerFactory entityManagerFactory;
     private static EntityManager entityManager;
+
+    public static void initializeEntityManagerFactory() {
+        if(entityManagerFactory == null) {
+            entityManagerFactory = Persistence.createEntityManagerFactory("bankingApi");
+        }
+    }
 
     public static EntityManager getEntityManager(){
         if(entityManager==null){
-            EntityManagerFactory emf = Persistence.createEntityManagerFactory("bankingApi");
-            entityManager = emf.createEntityManager();
+            if(entityManagerFactory == null) {
+                initializeEntityManagerFactory();
+            }
+            entityManager = entityManagerFactory.createEntityManager();
         }
         return entityManager;
     }

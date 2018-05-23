@@ -1,6 +1,8 @@
 package com.revolut;
 
+import com.revolut.persistence.repository.AccountRepository;
 import com.revolut.persistence.repository.TransactionRepository;
+import com.revolut.service.TransactionService;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 
 import javax.inject.Singleton;
@@ -11,6 +13,12 @@ import javax.inject.Singleton;
  */
 public class ApplicationBinder extends AbstractBinder {
     protected void configure() {
-        bind(new TransactionRepository()).to(TransactionRepository.class).in(Singleton.class);
+        TransactionRepository transactionRepository = new TransactionRepository();
+        AccountRepository accountRepository = new AccountRepository();
+        TransactionService transactionService = new TransactionService(transactionRepository, accountRepository);
+
+        bind(transactionRepository).to(TransactionRepository.class).in(Singleton.class);
+        bind(accountRepository).to(AccountRepository.class).in(Singleton.class);
+        bind(transactionService).to(TransactionService.class).in(Singleton.class);
     }
 }
