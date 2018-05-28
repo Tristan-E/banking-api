@@ -1,5 +1,8 @@
-package com.revolut.persistence.model;
+package com.revolut.dto;
 
+import com.revolut.persistence.model.Account;
+import com.revolut.persistence.model.TransactionMethod;
+import com.revolut.persistence.model.TransactionStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -8,33 +11,26 @@ import java.time.ZonedDateTime;
 
 /**
  * @author teyma
- * @since 19/05/2018
+ * @since 28/05/2018
  */
-@Entity
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
-public class Transaction {
+public class TransactionDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
 
     private BigDecimal amount;
 
-    @ManyToOne
-    private Account sourceAccount;
+    private long sourceAccountId;
 
-    @ManyToOne
-    private Account destinationAccount;
+    private long destinationAccountId;
 
     private ZonedDateTime date;
 
-    @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
-    @Enumerated(EnumType.STRING)
     private TransactionMethod method;
 }

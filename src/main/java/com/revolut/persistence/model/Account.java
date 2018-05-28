@@ -1,14 +1,9 @@
 package com.revolut.persistence.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author teyma
@@ -17,21 +12,15 @@ import java.util.Collection;
 @Entity
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "movements")
 @EqualsAndHashCode
+@NoArgsConstructor
 public class Account {
-
-    public Account() {
-        this.currentBalance = BigDecimal.ZERO;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
 
-    @NotNull
-    private BigDecimal currentBalance;
-
     @OneToMany(fetch = FetchType.LAZY)
-    private Collection<Transaction> transactions;
+    private List<Movement> movements;
 }

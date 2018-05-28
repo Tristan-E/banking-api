@@ -2,6 +2,7 @@ package com.revolut.service;
 
 import com.revolut.persistence.PersistenceUtil;
 import com.revolut.persistence.model.Account;
+import com.revolut.persistence.model.Movement;
 import com.revolut.persistence.model.Transaction;
 import com.revolut.persistence.model.TransactionStatus;
 import com.revolut.persistence.repository.AccountRepository;
@@ -33,18 +34,27 @@ public class TransactionService {
         Account sourceAccount = accountRepository.findOne(transaction.getSourceAccount().getId());
         Account destinationAccount = accountRepository.findOne(transaction.getDestinationAccount().getId());
 
+        BigDecimal sourceAccountBalance = sourceAccount.getMovements().stream()
+                .map(m -> m.getAmount())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         // Verifying balance allows the transaction
-        if(sourceAccount.getCurrentBalance().subtract(transaction.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
+        if(sourceAccountBalance.subtract(transaction.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
             transaction.setStatus(TransactionStatus.CHALLENGED);
         } else {
-            sourceAccount.setCurrentBalance(sourceAccount.getCurrentBalance().subtract(transaction.getAmount()));
-            destinationAccount.setCurrentBalance(destinationAccount.getCurrentBalance().add(transaction.getAmount()));
+            Movement sourceMovement = new Movement(sourceAccount, transaction.getAmount().negate());
+            Movement destinationMovement = new Movement(destinationAccount, transaction.getAmount());
+            
+            sourceAccount.getMovements().add(sourceMovement);
+            destinationAccount.getMovements().add(destinationMovement);
+
             transaction.setStatus(TransactionStatus.COMPLETED);
 
-            entityManager.persist(sourceAccount);
-            entityManager.persist(destinationAccount);
+            entityManager.persist(sourceMovement);
+            entityManager.persist(destinationMovement);
+            entityManager.merge(sourceAccount);
+            entityManager.merge(destinationAccount);
         }
-
         entityManager.persist(transaction);
 
         entityManager.getTransaction().commit();

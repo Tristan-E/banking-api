@@ -1,5 +1,7 @@
 package com.revolut.controller;
 
+import com.revolut.dto.AccountDTO;
+import com.revolut.mapper.AccountMapper;
 import com.revolut.persistence.model.Account;
 import com.revolut.persistence.repository.AccountRepository;
 import io.swagger.annotations.Api;
@@ -9,7 +11,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author teyma
@@ -20,15 +24,19 @@ import java.util.List;
 public class AccountController {
 
     private final AccountRepository accountRepository;
+    private final AccountMapper accountMapper;
 
     @Inject
-    public AccountController(final AccountRepository accountRepository) {
+    public AccountController(final AccountRepository accountRepository, final AccountMapper accountMapper) {
         this.accountRepository = accountRepository;
+        this.accountMapper = accountMapper;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Account> getAccounts() {
-        return accountRepository.findAll();
+    public List<AccountDTO> getAccounts() {
+        return accountMapper.accountsToAccountDTOs(
+                accountRepository.findAll()
+        );
     }
 }
