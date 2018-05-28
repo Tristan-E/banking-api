@@ -1,10 +1,9 @@
 package com.revolut.mapper;
 
+import com.google.common.collect.Lists;
+import com.revolut.dto.MovementDTO;
 import com.revolut.dto.TransactionDTO;
-import com.revolut.persistence.model.Account;
-import com.revolut.persistence.model.Transaction;
-import com.revolut.persistence.model.TransactionMethod;
-import com.revolut.persistence.model.TransactionStatus;
+import com.revolut.persistence.model.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,6 +32,7 @@ public class TransactionMapperTest {
         transaction.setSourceAccount(sourceAccount);
         transaction.setDate(ZonedDateTime.now());
         transaction.setMethod(TransactionMethod.CREDIT_CARD);
+        transaction.setMovements(Lists.newArrayList(new Movement(),new Movement(),new Movement()));
 
         //when
         TransactionDTO transactionDTO = TransactionMapper.INSTANCE.transactionToTransactionDTO(transaction);
@@ -52,6 +52,7 @@ public class TransactionMapperTest {
         transactionDTO.setSourceAccountId(1L);
         transactionDTO.setDate(ZonedDateTime.now());
         transactionDTO.setMethod(TransactionMethod.BANK_TRANSFER);
+        transactionDTO.setMovements(Lists.newArrayList(new MovementDTO(),new MovementDTO(),new MovementDTO()));
 
         //when
         Transaction transaction = TransactionMapper.INSTANCE.transactionDTOToTransaction(transactionDTO);
@@ -68,5 +69,6 @@ public class TransactionMapperTest {
         Assert.assertEquals(transaction.getSourceAccount().getId(), transactionDTO.getSourceAccountId());
         Assert.assertEquals(transaction.getDate(), transactionDTO.getDate());
         Assert.assertEquals(transaction.getMethod(), transactionDTO.getMethod());
+        Assert.assertEquals(transaction.getMovements().size(), transactionDTO.getMovements().size());
     }
 }

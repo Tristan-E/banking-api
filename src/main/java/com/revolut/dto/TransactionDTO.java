@@ -1,6 +1,7 @@
 package com.revolut.dto;
 
 import com.revolut.persistence.model.Account;
+import com.revolut.persistence.model.Movement;
 import com.revolut.persistence.model.TransactionMethod;
 import com.revolut.persistence.model.TransactionStatus;
 import lombok.*;
@@ -8,6 +9,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * @author teyma
@@ -33,4 +35,6 @@ public class TransactionDTO {
     private TransactionStatus status;
 
     private TransactionMethod method;
+
+    private List<MovementDTO> movements;
 }

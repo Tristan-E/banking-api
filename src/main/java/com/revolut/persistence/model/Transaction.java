@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * @author teyma
@@ -37,4 +38,7 @@ public class Transaction {
 
     @Enumerated(EnumType.STRING)
     private TransactionMethod method;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Movement> movements;
 }

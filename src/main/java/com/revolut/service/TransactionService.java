@@ -1,5 +1,6 @@
 package com.revolut.service;
 
+import com.google.common.collect.Lists;
 import com.revolut.persistence.PersistenceUtil;
 import com.revolut.persistence.model.Account;
 import com.revolut.persistence.model.Movement;
@@ -49,6 +50,7 @@ public class TransactionService {
             destinationAccount.getMovements().add(destinationMovement);
 
             transaction.setStatus(TransactionStatus.COMPLETED);
+            transaction.getMovements().addAll(Lists.newArrayList(sourceMovement, destinationMovement));
 
             entityManager.persist(sourceMovement);
             entityManager.persist(destinationMovement);

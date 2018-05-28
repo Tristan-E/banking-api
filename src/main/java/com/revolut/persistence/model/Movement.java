@@ -29,10 +29,9 @@ public class Movement {
     @ManyToOne
     private Account account;
 
+    @ManyToOne
+    private Transaction transaction;
+
     private BigDecimal amount;
 
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
 }

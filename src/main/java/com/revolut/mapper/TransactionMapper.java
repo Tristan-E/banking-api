@@ -14,7 +14,7 @@ import java.util.List;
  * @author teyma
  * @since 28/05/18
  */
-@Mapper
+@Mapper(uses = MovementMapper.class)
 public interface TransactionMapper {
 
     TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);
