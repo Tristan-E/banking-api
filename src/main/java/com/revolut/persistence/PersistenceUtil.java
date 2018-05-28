@@ -8,7 +8,7 @@ import javax.persistence.Persistence;
  * @author teyma
  * @since 19/05/2018
  */
-public class PersistenceUtil {
+public final class PersistenceUtil {
 
     private static EntityManagerFactory entityManagerFactory;
     private static EntityManager entityManager;

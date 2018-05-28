@@ -25,7 +25,7 @@ public interface AccountMapper {
 
     List<AccountDTO> accountsToAccountDTOs(List<Account> accounts);
 
-    Account accountToAccountDTO(AccountDTO accountDTO);
+    Account accountDTOToAccount(AccountDTO accountDTO);
 
     /**
      * Sum each movement amount

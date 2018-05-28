@@ -44,7 +44,7 @@ public class AccountMapperTest {
         accountDTO.setMovements(Lists.newArrayList(new MovementDTO(), new MovementDTO()));
 
         //when
-        Account account = AccountMapper.INSTANCE.accountToAccountDTO(accountDTO);
+        Account account = AccountMapper.INSTANCE.accountDTOToAccount(accountDTO);
 
         //then
         defaultAssertions(account, accountDTO);
