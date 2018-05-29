@@ -7,30 +7,32 @@ import java.util.List;
  * @author teyma
  * @since 20/05/2018
  */
-public abstract class AbstractHibernateRepository<T> implements IGenericRepository<T>{
+public abstract class AbstractHibernateRepository<T> implements IGenericRepository<T> {
+
+    private final EntityManager entityManager;
+
     private Class<T> clazz;
 
-    public AbstractHibernateRepository(Class<T> clazz) {
+    public AbstractHibernateRepository(final EntityManager entityManager, Class<T> clazz) {
+        this.entityManager = entityManager;
         this.clazz = clazz;
     }
 
     public T findOne(long id) {
-        return (T) PersistenceUtil.getEntityManager().createQuery(String.format("from %s where id = %d", clazz.getName(), id)).getSingleResult();
+        return (T) entityManager.createQuery(String.format("from %s where id = %d", clazz.getName(), id)).getSingleResult();
     }
 
     public List<T> findAll() {
-        return PersistenceUtil.getEntityManager().createQuery("from " + clazz.getName()).getResultList();
+        return entityManager.createQuery("from " + clazz.getName()).getResultList();
     }
 
     public void create(T entity) {
-        EntityManager entityManager = PersistenceUtil.getEntityManager();
         entityManager.getTransaction().begin();
         entityManager.persist(entity);
         entityManager.getTransaction().commit();
     }
 
     public T update(T entity) {
-        EntityManager entityManager = PersistenceUtil.getEntityManager();
         entityManager.getTransaction().begin();
         entity = entityManager.merge(entity);
         entityManager.getTransaction().commit();
@@ -39,14 +41,12 @@ public abstract class AbstractHibernateRepository<T> implements IGenericReposito
     }
 
     public void delete(T entity) {
-        EntityManager entityManager = PersistenceUtil.getEntityManager();
         entityManager.getTransaction().begin();
         entityManager.remove(entity);
         entityManager.getTransaction().commit();
     }
 
     public void deleteById(long entityId) {
-        EntityManager entityManager = PersistenceUtil.getEntityManager();
         entityManager.getTransaction().begin();
 
         T entity = (T) entityManager.createQuery(String.format("from %s where id = %d", clazz.getName(), entityId)).getSingleResult();

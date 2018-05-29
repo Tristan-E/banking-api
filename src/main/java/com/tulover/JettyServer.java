@@ -61,31 +61,11 @@ public class JettyServer {
         context.setResourceBase(resourceBasePath);
         context.addServlet(new ServletHolder(new DefaultServlet()), "/*");
 
-        // Initializing Persistence
-        PersistenceUtil.initializeEntityManagerFactory();
-
         try {
             jettyServer.start();
             jettyServer.join();
         } finally {
             jettyServer.destroy();
         }
-    }
-
-    // TODO REMOVE
-    private static void generateInitialContent() {
-        EntityManager entityManager = PersistenceUtil.getEntityManager();
-
-        // before persisting an object to db, starting the transaction
-        entityManager.getTransaction().begin();
-
-        // first entity
-        Transaction transaction = new Transaction();
-        transaction.setAmount(new BigDecimal(1010));
-
-        // persisting it to database
-        entityManager.persist(transaction);
-
-        entityManager.getTransaction().commit();
     }
 }

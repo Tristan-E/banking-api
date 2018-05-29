@@ -13,14 +13,8 @@ public final class PersistenceUtil {
     private static EntityManagerFactory entityManagerFactory;
     private static EntityManager entityManager;
 
-    public static void initializeEntityManagerFactory() {
-        if(entityManagerFactory == null) {
-            entityManagerFactory = Persistence.createEntityManagerFactory("bankingApi");
-        }
-    }
-
     public static EntityManager getEntityManager(){
-        if(entityManager==null){
+        if(entityManager == null){
             if(entityManagerFactory == null) {
                 initializeEntityManagerFactory();
             }
@@ -29,4 +23,9 @@ public final class PersistenceUtil {
         return entityManager;
     }
 
+    private static void initializeEntityManagerFactory() {
+        if(entityManagerFactory == null) {
+            entityManagerFactory = Persistence.createEntityManagerFactory("bankingApi");
+        }
+    }
 }

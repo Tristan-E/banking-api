@@ -20,17 +20,18 @@ import java.math.BigDecimal;
  */
 public class TransactionService {
 
+    private final EntityManager entityManager;
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
 
     @Inject
-    public TransactionService(final TransactionRepository transactionRepository, final AccountRepository accountRepository) {
+    public TransactionService(final EntityManager entityManager, final TransactionRepository transactionRepository, final AccountRepository accountRepository) {
+        this.entityManager = entityManager;
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
     }
 
     public void create(Transaction transaction) {
-        EntityManager entityManager = PersistenceUtil.getEntityManager();
         entityManager.getTransaction().begin();
 
         try {
@@ -48,7 +49,7 @@ public class TransactionService {
             if (sourceAccountBalance.subtract(transaction.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
                 transaction.setStatus(TransactionStatus.CHALLENGED);
             } else {
-                doTransaction(entityManager, transaction, sourceAccount, destinationAccount);
+                doTransaction(transaction);
             }
             entityManager.persist(transaction);
 
@@ -59,7 +60,6 @@ public class TransactionService {
     }
 
     public void authorizeTransaction(long transactionId) {
-        EntityManager entityManager = PersistenceUtil.getEntityManager();
         entityManager.getTransaction().begin();
 
         try {
@@ -73,7 +73,7 @@ public class TransactionService {
             Account sourceAccount = transaction.getSourceAccount();
             Account destinationAccount = transaction.getDestinationAccount();
 
-            doTransaction(entityManager, transaction, sourceAccount, destinationAccount);
+            doTransaction(transaction);
             entityManager.merge(transaction);
 
             entityManager.getTransaction().commit();
@@ -83,7 +83,6 @@ public class TransactionService {
     }
 
     public void denyTransaction(long transactionId) {
-        EntityManager entityManager = PersistenceUtil.getEntityManager();
         entityManager.getTransaction().begin();
 
         try{
@@ -105,12 +104,12 @@ public class TransactionService {
 
     /**
      * Create movement on each account and associate entities.
-     * @param entityManager
      * @param transaction
-     * @param sourceAccount
-     * @param destinationAccount
      */
-    private void doTransaction(EntityManager entityManager, Transaction transaction, Account sourceAccount, Account destinationAccount) {
+    private void doTransaction(Transaction transaction) {
+        Account sourceAccount = transaction.getSourceAccount();
+        Account destinationAccount = transaction.getDestinationAccount();
+
         Movement sourceMovement = new Movement(sourceAccount, transaction.getAmount().negate());
         Movement destinationMovement = new Movement(destinationAccount, transaction.getAmount());
 
