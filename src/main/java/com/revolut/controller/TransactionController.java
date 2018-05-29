@@ -2,6 +2,7 @@ package com.revolut.controller;
 
 import com.revolut.dto.TransactionDTO;
 import com.revolut.mapper.TransactionMapper;
+import com.revolut.persistence.model.TransactionStatus;
 import com.revolut.persistence.repository.TransactionRepository;
 import com.revolut.persistence.model.Transaction;
 import com.revolut.service.TransactionService;
@@ -47,8 +48,7 @@ public class TransactionController {
         );
     }
 
-    @PUT
-    @Produces(MediaType.APPLICATION_JSON)
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public void createTransaction(TransactionDTO transactionDTO) {
         transactionService.create(
@@ -56,4 +56,15 @@ public class TransactionController {
         );
     }
 
+    @PUT
+    @Path("/{id}/authorize")
+    public void authorizeTransaction(@PathParam("id") long id) {
+        transactionService.authorizeTransaction(id);
+    }
+
+    @PUT
+    @Path("/{id}/deny")
+    public void denyTransaction(@PathParam("id") long id) {
+        transactionService.denyTransaction(id);
+    }
 }

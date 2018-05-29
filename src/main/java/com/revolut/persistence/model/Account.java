@@ -3,6 +3,7 @@ package com.revolut.persistence.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,13 +15,16 @@ import java.util.List;
 @Setter
 @ToString(exclude = "movements")
 @EqualsAndHashCode
-@NoArgsConstructor
 public class Account {
+
+    public Account() {
+        this.movements = new ArrayList<>();
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Movement> movements;
 }

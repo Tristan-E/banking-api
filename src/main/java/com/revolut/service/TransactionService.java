@@ -11,6 +11,7 @@ import com.revolut.persistence.repository.TransactionRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 import java.math.BigDecimal;
 
 /**
@@ -32,33 +33,96 @@ public class TransactionService {
         EntityManager entityManager = PersistenceUtil.getEntityManager();
         entityManager.getTransaction().begin();
 
-        Account sourceAccount = accountRepository.findOne(transaction.getSourceAccount().getId());
-        Account destinationAccount = accountRepository.findOne(transaction.getDestinationAccount().getId());
+        try {
+            Account sourceAccount = accountRepository.findOne(transaction.getSourceAccount().getId());
+            Account destinationAccount = accountRepository.findOne(transaction.getDestinationAccount().getId());
 
-        BigDecimal sourceAccountBalance = sourceAccount.getMovements().stream()
-                .map(m -> m.getAmount())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            transaction.setSourceAccount(sourceAccount);
+            transaction.setDestinationAccount(destinationAccount);
 
-        // Verifying balance allows the transaction
-        if(sourceAccountBalance.subtract(transaction.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
-            transaction.setStatus(TransactionStatus.CHALLENGED);
-        } else {
-            Movement sourceMovement = new Movement(sourceAccount, transaction.getAmount().negate());
-            Movement destinationMovement = new Movement(destinationAccount, transaction.getAmount());
-            
-            sourceAccount.getMovements().add(sourceMovement);
-            destinationAccount.getMovements().add(destinationMovement);
+            BigDecimal sourceAccountBalance = sourceAccount.getMovements().stream()
+                    .map(m -> m.getAmount())
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            transaction.setStatus(TransactionStatus.COMPLETED);
-            transaction.getMovements().addAll(Lists.newArrayList(sourceMovement, destinationMovement));
+            // Verifying balance allows the transaction
+            if (sourceAccountBalance.subtract(transaction.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
+                transaction.setStatus(TransactionStatus.CHALLENGED);
+            } else {
+                doTransaction(entityManager, transaction, sourceAccount, destinationAccount);
+            }
+            entityManager.persist(transaction);
 
-            entityManager.persist(sourceMovement);
-            entityManager.persist(destinationMovement);
-            entityManager.merge(sourceAccount);
-            entityManager.merge(destinationAccount);
+            entityManager.getTransaction().commit();
+        } catch (PersistenceException p) {
+            entityManager.getTransaction().rollback();
         }
-        entityManager.persist(transaction);
+    }
 
-        entityManager.getTransaction().commit();
+    public void authorizeTransaction(long transactionId) {
+        EntityManager entityManager = PersistenceUtil.getEntityManager();
+        entityManager.getTransaction().begin();
+
+        try {
+            Transaction transaction = transactionRepository.findOne(transactionId);
+
+            if (transaction == null || !TransactionStatus.CHALLENGED.equals(transaction.getStatus())) {
+                entityManager.getTransaction().rollback();
+                throw new Error("TODO CREATE ERROR");
+            }
+
+            Account sourceAccount = transaction.getSourceAccount();
+            Account destinationAccount = transaction.getDestinationAccount();
+
+            doTransaction(entityManager, transaction, sourceAccount, destinationAccount);
+            entityManager.merge(transaction);
+
+            entityManager.getTransaction().commit();
+        } catch (PersistenceException p) {
+            entityManager.getTransaction().rollback();
+        }
+    }
+
+    public void denyTransaction(long transactionId) {
+        EntityManager entityManager = PersistenceUtil.getEntityManager();
+        entityManager.getTransaction().begin();
+
+        try{
+            Transaction transaction = transactionRepository.findOne(transactionId);
+
+            if(transaction == null || !TransactionStatus.CHALLENGED.equals(transaction.getStatus())) {
+                entityManager.getTransaction().rollback();
+                throw new Error("TODO CREATE ERROR");
+            }
+
+            transaction.setStatus(TransactionStatus.DENIED);
+            entityManager.merge(transaction);
+
+            entityManager.getTransaction().commit();
+        } catch (PersistenceException p) {
+            entityManager.getTransaction().rollback();
+        }
+    }
+
+    /**
+     * Create movement on each account and associate entities.
+     * @param entityManager
+     * @param transaction
+     * @param sourceAccount
+     * @param destinationAccount
+     */
+    private void doTransaction(EntityManager entityManager, Transaction transaction, Account sourceAccount, Account destinationAccount) {
+        Movement sourceMovement = new Movement(sourceAccount, transaction.getAmount().negate());
+        Movement destinationMovement = new Movement(destinationAccount, transaction.getAmount());
+
+        sourceAccount.getMovements().add(sourceMovement);
+        destinationAccount.getMovements().add(destinationMovement);
+
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        transaction.setMovements(Lists.newArrayList(sourceMovement, destinationMovement));
+
+        entityManager.persist(sourceMovement);
+        entityManager.persist(destinationMovement);
+        entityManager.merge(sourceAccount);
+        entityManager.merge(destinationAccount);
     }
 }

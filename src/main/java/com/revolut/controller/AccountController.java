@@ -45,10 +45,9 @@ public class AccountController {
         );
     }
 
-    @PUT
-    @Produces(MediaType.APPLICATION_JSON)
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public void createTransaction(AccountDTO accountDTO) {
+    public void createAccount(AccountDTO accountDTO) {
         accountRepository.create(
                 accountMapper.accountDTOToAccount(accountDTO)
         );
