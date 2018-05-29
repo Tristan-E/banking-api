@@ -217,7 +217,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.revolut.JettyServer</mainClass>
+                            <mainClass>com.tulover.JettyServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
