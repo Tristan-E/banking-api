@@ -22,9 +22,11 @@ public class ApplicationBinder extends AbstractBinder {
 
         TransactionRepository transactionRepository = new TransactionRepository(entityManager);
         AccountRepository accountRepository = new AccountRepository(entityManager);
-        TransactionService transactionService = new TransactionService(entityManager, transactionRepository, accountRepository);
+
         TransactionMapper transactionMapper = TransactionMapper.INSTANCE;
         AccountMapper accountMapper = AccountMapper.INSTANCE;
+
+        TransactionService transactionService = new TransactionService(entityManager, transactionRepository, transactionMapper, accountRepository);
 
         bind(transactionRepository).to(TransactionRepository.class).in(Singleton.class);
         bind(accountRepository).to(AccountRepository.class).in(Singleton.class);

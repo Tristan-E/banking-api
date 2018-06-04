@@ -305,7 +305,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>src/it/java/com/revolut</source>
+                                <source>src/it/java/com/tulover</source>
                             </sources>
                         </configuration>
                     </execution>

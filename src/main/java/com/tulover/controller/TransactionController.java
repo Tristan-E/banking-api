@@ -12,45 +12,35 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 @Path("/transactions")
-@Api
+@Api(value = "Transaction Controller")
 public class TransactionController {
 
     private final TransactionService transactionService;
-    private final TransactionRepository transactionRepository;
-    private final TransactionMapper transactionMapper;
 
     @Inject
     public TransactionController(final TransactionRepository transactionRepository,
                                  final TransactionService transactionService,
                                  final TransactionMapper transactionMapper) {
         this.transactionService = transactionService;
-        this.transactionRepository = transactionRepository;
-        this.transactionMapper = transactionMapper;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<TransactionDTO> getTransactions() {
-        return transactionMapper.transactionsToTransactionDTOs(
-                transactionRepository.findAll()
-        );
+        return transactionService.getTransactions();
     }
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public TransactionDTO getTransaction(@PathParam("id") long id) {
-        return transactionMapper.transactionToTransactionDTO(
-                transactionRepository.findOne(id)
-        );
+        return transactionService.getTransaction(id);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public void createTransaction(TransactionDTO transactionDTO) {
-        transactionService.create(
-                transactionMapper.transactionDTOToTransaction(transactionDTO)
-        );
+        transactionService.create(transactionDTO);
     }
 
     @PUT

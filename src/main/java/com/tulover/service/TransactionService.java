@@ -1,7 +1,8 @@
 package com.tulover.service;
 
 import com.google.common.collect.Lists;
-import com.tulover.persistence.PersistenceUtil;
+import com.tulover.dto.TransactionDTO;
+import com.tulover.mapper.TransactionMapper;
 import com.tulover.persistence.model.Account;
 import com.tulover.persistence.model.Movement;
 import com.tulover.persistence.model.Transaction;
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author teyma
@@ -22,16 +24,33 @@ public class TransactionService {
 
     private final EntityManager entityManager;
     private final TransactionRepository transactionRepository;
+    private final TransactionMapper transactionMapper;
     private final AccountRepository accountRepository;
 
     @Inject
-    public TransactionService(final EntityManager entityManager, final TransactionRepository transactionRepository, final AccountRepository accountRepository) {
+    public TransactionService(final EntityManager entityManager, final TransactionRepository transactionRepository,
+                              final TransactionMapper transactionMapper, final AccountRepository accountRepository) {
         this.entityManager = entityManager;
         this.transactionRepository = transactionRepository;
+        this.transactionMapper = transactionMapper;
         this.accountRepository = accountRepository;
     }
 
-    public void create(Transaction transaction) {
+    public List<TransactionDTO> getTransactions() {
+        return transactionMapper.transactionsToTransactionDTOs(
+                transactionRepository.findAll()
+        );
+    }
+
+    public TransactionDTO getTransaction(long id) {
+        return transactionMapper.transactionToTransactionDTO(
+                transactionRepository.findOne(id)
+        );
+    }
+
+    public void create(TransactionDTO transactionDTO) {;
+        Transaction transaction = transactionMapper.transactionDTOToTransaction(transactionDTO);
+
         entityManager.getTransaction().begin();
 
         try {
@@ -69,9 +88,6 @@ public class TransactionService {
                 entityManager.getTransaction().rollback();
                 throw new Error("TODO CREATE ERROR");
             }
-
-            Account sourceAccount = transaction.getSourceAccount();
-            Account destinationAccount = transaction.getDestinationAccount();
 
             doTransaction(transaction);
             entityManager.merge(transaction);

@@ -1,8 +1,7 @@
 package com.tulover.controller;
 
 import com.tulover.dto.AccountDTO;
-import com.tulover.mapper.AccountMapper;
-import com.tulover.persistence.repository.AccountRepository;
+import com.tulover.service.AccountService;
 import io.swagger.annotations.Api;
 
 import javax.inject.Inject;
@@ -15,40 +14,32 @@ import java.util.List;
  * @since 21/05/2018
  */
 @Path("/accounts")
-@Api
+@Api(value = "Account Controller")
 public class AccountController {
 
-    private final AccountRepository accountRepository;
-    private final AccountMapper accountMapper;
+    private final AccountService accountService;
 
     @Inject
-    public AccountController(final AccountRepository accountRepository, final AccountMapper accountMapper) {
-        this.accountRepository = accountRepository;
-        this.accountMapper = accountMapper;
+    public AccountController(final AccountService accountService) {
+        this.accountService = accountService;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<AccountDTO> getAccounts() {
-        return accountMapper.accountsToAccountDTOs(
-                accountRepository.findAll()
-        );
+        return accountService.getAccounts();
     }
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public AccountDTO getAccount(@PathParam("id") long id) {
-        return accountMapper.accountToAccountDTO(
-                accountRepository.findOne(id)
-        );
+        return accountService.getAccount(id);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public void createAccount(AccountDTO accountDTO) {
-        accountRepository.create(
-                accountMapper.accountDTOToAccount(accountDTO)
-        );
+        accountService.create(accountDTO);
     }
 }
