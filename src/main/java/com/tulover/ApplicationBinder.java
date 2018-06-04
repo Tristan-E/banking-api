@@ -5,6 +5,7 @@ import com.tulover.mapper.TransactionMapper;
 import com.tulover.persistence.PersistenceUtil;
 import com.tulover.persistence.repository.AccountRepository;
 import com.tulover.persistence.repository.TransactionRepository;
+import com.tulover.service.AccountService;
 import com.tulover.service.TransactionService;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 
@@ -27,11 +28,15 @@ public class ApplicationBinder extends AbstractBinder {
         AccountMapper accountMapper = AccountMapper.INSTANCE;
 
         TransactionService transactionService = new TransactionService(entityManager, transactionRepository, transactionMapper, accountRepository);
+        AccountService accountService = new AccountService(entityManager, accountRepository, accountMapper);
 
         bind(transactionRepository).to(TransactionRepository.class).in(Singleton.class);
         bind(accountRepository).to(AccountRepository.class).in(Singleton.class);
-        bind(transactionService).to(TransactionService.class).in(Singleton.class);
+
         bind(transactionMapper).to(TransactionMapper.class).in(Singleton.class);
         bind(accountMapper).to(AccountMapper.class).in(Singleton.class);
+
+        bind(transactionService).to(TransactionService.class).in(Singleton.class);
+        bind(accountService).to(AccountService.class).in(Singleton.class);
     }
 }
